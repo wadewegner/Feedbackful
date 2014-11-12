@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Web.Entities.AnswerEntity>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.AnswerKey)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.QuestionKey)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PossibleAnswer)
+        </th>
+        <th></th>
+    </tr>
+
+    @if (Model != null)
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AnswerKey)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.QuestionKey)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PossibleAnswer)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new {id = item.AnswerKey}) |
+                    @Html.ActionLink("Details", "Details", new {id = item.AnswerKey}) |
+                    @Html.ActionLink("Delete", "Delete", new {id = item.AnswerKey})
+                </td>
+            </tr>
+        }
+    }
+
+</table>

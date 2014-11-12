@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-16"?>
+<application xmlns="http://wadl.dev.java.net/2009/02" xmlns:siena="http://schemas.microsoft.com/MicrosoftProjectSiena/v1/WADL" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sienatool="http://www.todo.com">
+  <siena:header formatVersion="1.1" fileVersion="1.0" serviceId="Feedbackful" author="WadlTool" />
+  <!-- Grammars -->
+  <grammars>
+    <jsonTypes targetNamespace="http://www.todo.com" xmlns="http://schemas.microsoft.com/MicrosoftProjectSiena/v1/WADL">
+      <object name="QuestionAndAnswers_Root">
+        <property name="Question" type="string" />
+        <property name="Answers" typeRef="QuestionAndAnswers_Answers_Array" />
+      </object>
+      <object name="QuestionAndAnswers_Answers_Object">
+        <property name="PossibleAnswer" type="string" />
+      </object>
+      <array name="QuestionAndAnswers_Answers_Array" typeRef="QuestionAndAnswers_Answers_Object" />
+    </jsonTypes>
+  </grammars>
+  <!-- Resources -->
+  <resources base="http://localhost:64062/">
+    <resource path="api/questionandanswer/">
+      <method name="GET" id="QuestionAndAnswers">
+        <request>
+          <param name="presentationCode" style="query" siena:sampleDefault="001" required="true" />
+          <param name="questionCode" style="query" siena:sampleDefault="001" required="true" />
+        </request>
+        <response siena:resultForm="single">
+          <representation mediaType="application/json">
+            <param name="QuestionAndAnswers_Name" type="sienatool:QuestionAndAnswers_Root" style="plain" path="" />
+          </representation>
+        </response>
+      </method>
+    </resource>
+    <resource path="api/questionandanswer">
+      <method name="POST" id="AddAnswerAndFeedback">
+        <request>
+           <representation mediaType="application/x-www-form-urlencoded">
+              <param style="query" name="PresentationCode"  type="xs:string"  required="true" siena:sampleDefault="001" />
+              <param style="query" name="QuestionCode"      type="xs:string"  required="true" siena:sampleDefault="123" />
+              <param style="query" name="Answer1"           type="xs:boolean" required="true" siena:sampleDefault="false" />
+              <param style="query" name="Answer2"           type="xs:boolean" required="true" siena:sampleDefault="false" />
+              <param style="query" name="Answer3"           type="xs:boolean" required="true" siena:sampleDefault="false" />
+              <param style="query" name="Answer4"           type="xs:boolean" required="true" siena:sampleDefault="false" />
+              <param style="query" name="Feedback"          type="xs:string"  required="true" siena:sampleDefault="testing 123" />
+           </representation>
+        </request>
+      </method>
+    </resource>
+  </resources>
+</application>

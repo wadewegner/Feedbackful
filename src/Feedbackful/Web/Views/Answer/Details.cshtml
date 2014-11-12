@@ -1,0 +1,43 @@
+﻿@model Web.Entities.AnswerEntity
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>AnswerEntity</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.AnswerKey)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AnswerKey)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.QuestionKey)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.QuestionKey)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PossibleAnswer)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PossibleAnswer)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
