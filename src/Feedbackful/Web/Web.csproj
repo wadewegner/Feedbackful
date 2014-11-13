@@ -204,6 +204,7 @@
     <Compile Include="Controllers\AnswerController.cs" />
     <Compile Include="Controllers\DisplayAnswersController.cs" />
     <Compile Include="Controllers\QuestionController.cs" />
+    <Compile Include="Controllers\ReportsController.cs" />
     <Compile Include="Entities\AnswerEntity.cs" />
     <Compile Include="Entities\AnswersAndFeedbackEntity.cs" />
     <Compile Include="Entities\QuestionEntity.cs" />
@@ -290,6 +291,7 @@
     <Content Include="Views\Answer\Edit.cshtml" />
     <Content Include="Views\Answer\Delete.cshtml" />
     <Content Include="Views\DisplayAnswers\Index.cshtml" />
+    <Content Include="Views\Reports\Index.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

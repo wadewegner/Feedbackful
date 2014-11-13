@@ -1,0 +1,45 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+@section scripts
+{
+    <script src="~/Scripts/jquery.signalR-2.1.2.js"></script>
+    
+    <script type="text/javascript">
+        PageController = function () {
+            var hub = null;
+            self = this;
+           
+            alert('test');
+
+            self.setupSignalR = function () {
+                console.log('creating connection');
+                connection = $.hubConnection();
+
+                hub = connection.createHubProxy('feedbackHub');
+
+                hub.on('feedback', function (presentationCode, questionCode, answer1, answer2, answer3, answer4, feedback) {
+
+                    alert(presentationCode);
+
+                });
+
+                connection.start(function () {
+                    console.log('connection started');
+                });
+            };
+        };
+
+        $(function () {
+            var controller = new PageController();
+            controller.setupSignalR();
+        });
+
+    </script>
+    
+}
