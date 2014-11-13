@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using Microsoft.AspNet.SignalR;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage.Table;
 using Web.Entities;
+using Web.Hubs;
 using Web.Models;
 using Web.Utils;
 
@@ -78,6 +80,18 @@ namespace Web.Controllers
             var table = storage.GetStorageTable("answersandfeedback");
             var insertOperation = TableOperation.Insert(asandfEntity);
             table.Execute(insertOperation);
+
+            var feedbackHub = GlobalHost.ConnectionManager.GetHubContext<FeedbackHub>(); 
+ 
+            feedbackHub.Clients.All.feedback(
+                asandf.PresentationCode,
+                asandf.QuestionCode,
+                asandf.Answer1,
+                asandf.Answer2,
+                asandf.Answer3,
+                asandf.Answer4,
+                asandf.Feedback); 
+
         }
     }
 }
