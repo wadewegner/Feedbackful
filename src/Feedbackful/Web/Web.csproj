@@ -176,6 +176,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AnswerController.cs" />
+    <Compile Include="Controllers\DisplayAnswersController.cs" />
     <Compile Include="Controllers\QuestionController.cs" />
     <Compile Include="Entities\AnswerEntity.cs" />
     <Compile Include="Entities\AnswersAndFeedbackEntity.cs" />
@@ -258,6 +259,7 @@
     <Content Include="Views\Answer\Create.cshtml" />
     <Content Include="Views\Answer\Edit.cshtml" />
     <Content Include="Views\Answer\Delete.cshtml" />
+    <Content Include="Views\DisplayAnswers\Index.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

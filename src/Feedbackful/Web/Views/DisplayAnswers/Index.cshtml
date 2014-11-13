@@ -1,0 +1,61 @@
+﻿@model IEnumerable<Web.Entities.AnswersAndFeedbackEntity>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.PresentationCode)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.QuestionCode)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Answer1)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Answer2)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Answer3)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Answer4)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Feedback)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.PresentationCode)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.QuestionCode)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Answer1)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Answer2)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Answer3)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Answer4)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Feedback)
+        </td>
+    </tr>
+}
+
+</table>
