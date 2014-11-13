@@ -13,8 +13,8 @@
 
 @section scripts
 {
-    <script src="~/Scripts/jquery.signalR-2.1.2.js"></script>
     <script src="~/Scripts/jquery-1.10.2.js" type="text/javascript"></script>
+    <script src="~/Scripts/jquery.signalR-2.1.2.js"></script>
     <script src="~/Scripts/Highcharts-4.0.1/js/highcharts.js" type="text/javascript"></script>
     
     <script type="text/javascript">
@@ -22,8 +22,6 @@
             var hub = null;
             self = this;
            
-            alert('test');
-
             self.setupSignalR = function () {
                 console.log('creating connection');
                 connection = $.hubConnection();
@@ -38,6 +36,7 @@
 
                 connection.start(function () {
                     console.log('connection started');
+                    alert('test');
                 });
             };
         };

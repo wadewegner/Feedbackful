@@ -8,5 +8,10 @@ namespace Web.Hubs
         {
             Clients.All.feedback(presentationCode, questionCode, answer1, answer2, answer3, answer4, feedback);
         }
+
+        public override System.Threading.Tasks.Task OnConnected()
+        {
+            return base.OnConnected();
+        }
     }
 }
