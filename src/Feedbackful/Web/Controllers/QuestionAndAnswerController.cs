@@ -81,16 +81,31 @@ namespace Web.Controllers
             var insertOperation = TableOperation.Insert(asandfEntity);
             table.Execute(insertOperation);
 
+
+            var answersAndFeedbackTable = storage.GetStorageTable("answersandfeedback");
+
+            IEnumerable<AnswersAndFeedbackEntity> query = ( from feedback in answersAndFeedbackTable.CreateQuery<AnswersAndFeedbackEntity>()
+                                                            where feedback.QuestionCode == asandf.QuestionCode
+                                                            select feedback);
+
+            var answer1 = query.Count(answerEntity => answerEntity.Answer1);
+            var answer2 = query.Count(answerEntity => answerEntity.Answer2);
+            var answer3 = query.Count(answerEntity => answerEntity.Answer3);
+            var answer4 = query.Count(answerEntity => answerEntity.Answer4);
+
             var feedbackHub = GlobalHost.ConnectionManager.GetHubContext<FeedbackHub>(); 
  
             feedbackHub.Clients.All.feedback(
-                asandf.PresentationCode,
-                asandf.QuestionCode,
-                asandf.Answer1,
-                asandf.Answer2,
-                asandf.Answer3,
-                asandf.Answer4,
-                asandf.Feedback); 
+                new FeedbackBit
+                {
+                    PresentationCode = asandf.PresentationCode,
+                    QuestionCode = asandf.QuestionCode,
+                    Answer1 = answer1,
+                    Answer2 = answer2,
+                    Answer3 = answer3,
+                    Answer4 = answer4,
+                    Feedback = asandf.Feedback
+                });
 
         }
     }
