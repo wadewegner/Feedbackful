@@ -204,6 +204,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AnswerController.cs" />
     <Compile Include="Controllers\DisplayAnswersController.cs" />
     <Compile Include="Controllers\QuestionController.cs" />
@@ -217,7 +218,6 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Models\QuestionAndAnswers.cs" />
     <Compile Include="Controllers\QuestionAndAnswerController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

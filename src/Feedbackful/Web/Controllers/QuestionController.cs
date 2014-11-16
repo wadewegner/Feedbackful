@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage.Table;
 using Web.Entities;
 using Web.Utils;
 
@@ -12,50 +9,38 @@ namespace Web.Controllers
 {
     public class QuestionController : Controller
     {
-        private readonly string _storageConnectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
-        private const string StorageTable = "questions";
+        private static readonly string StorageConnectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
+        private readonly Storage _storage = new Storage(StorageConnectionString, Constants.Questions);
 
-        // GET: ApiDefinition
+        // GET: Question
         public ActionResult Index()
         {
-            var storage = new Storage(_storageConnectionString);
-            var apiDefinitionEntitiesCloudTable = storage.GetStorageTable(StorageTable);
-            var apiDefinitionEntitiesQuery = new TableQuery<QuestionEntity>();
-            var apiDefinitionEntities = apiDefinitionEntitiesCloudTable.ExecuteQuery(apiDefinitionEntitiesQuery);
-
-            var enumerable = apiDefinitionEntities as QuestionEntity[] ?? apiDefinitionEntities.ToArray();
-            if (enumerable.Any())
-            {
-                return View(enumerable.ToList());
-            }
-
-            return View();
+            var questionEntities = _storage.GetEntities<QuestionEntity>().OrderBy(question => question.QuestionCode);
+            return View(questionEntities);
         }
-
-        // GET: ApiDefinition/Details/5
+        
+        // GET: Question/Details/5
         public ActionResult Details(string id)
         {
-            var questionEntity = GetQuestionEntityById(id);
-
+            var questionEntity = _storage.GetEntityByPartionKey<QuestionEntity>(id);
             return View(questionEntity);
         }
 
-        // GET: ApiDefinition/Create
+        // GET: Question/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: ApiDefinition/Create
+        // POST: Question/Create
         [HttpPost]
         public ActionResult Create(FormCollection collection)
         {
             try
             {
-                // TODO: Add insert logic here
                 var id = Guid.NewGuid().ToString();
                 var code = collection["PresentationCode"];
-                var questionAndAnswer = new QuestionEntity(id, code)
+                var questionEntity = new QuestionEntity(id, code)
                 {
                     QuestionKey = id,
                     PresentationCode = code,
@@ -63,10 +48,7 @@ namespace Web.Controllers
                     Question = collection["Question"],
                 };
 
-                var storage = new Storage(_storageConnectionString);
-                var table = storage.GetStorageTable(StorageTable);
-                var insertOperation = TableOperation.Insert(questionAndAnswer);
-                table.Execute(insertOperation);
+                _storage.InsertEntity(questionEntity);
 
                 return RedirectToAction("Index");
             }
@@ -76,30 +58,26 @@ namespace Web.Controllers
             }
         }
 
-        // GET: ApiDefinition/Edit/5
+        // GET: Question/Edit/5
         public ActionResult Edit(string id)
         {
-            var questionEntity = GetQuestionEntityById(id);
-
+            var questionEntity = _storage.GetEntityByPartionKey<QuestionEntity>(id);
             return View(questionEntity);
         }
 
-        // POST: ApiDefinition/Edit/5
+        // POST: Question/Edit/5
         [HttpPost]
         public ActionResult Edit(string id, FormCollection collection)
         {
             try
             {
-                var updatedQuestionEntity = GetQuestionEntityById(id);
+                var updatedQuestionEntity = _storage.GetEntityByPartionKey<QuestionEntity>(id);
 
                 updatedQuestionEntity.PresentationCode = collection["PresentationCode"];
                 updatedQuestionEntity.QuestionCode = collection["QuestionCode"];
                 updatedQuestionEntity.Question = collection["Question"];
 
-                var storage = new Storage(_storageConnectionString);
-                var table = storage.GetStorageTable(StorageTable);
-                var updateOperation = TableOperation.Replace(updatedQuestionEntity);
-                table.Execute(updateOperation);
+                _storage.UpdateEntity(updatedQuestionEntity);
 
                 return RedirectToAction("Index");
             }
@@ -109,27 +87,22 @@ namespace Web.Controllers
             }
         }
 
-        // GET: ApiDefinition/Delete/5
+        // GET: Question/Delete/5
         public ActionResult Delete(string id)
         {
-            var questionEntity = GetQuestionEntityById(id);
+            var questionEntity = _storage.GetEntityByPartionKey<QuestionEntity>(id);
 
             return View(questionEntity);
         }
 
-        // POST: ApiDefinition/Delete/5
+        // POST: Question/Delete/5
         [HttpPost]
         public ActionResult Delete(string id, FormCollection collection)
         {
             try
             {
-                var questionEntity = GetQuestionEntityById(id);
-
-                var storage = new Storage(_storageConnectionString);
-                var table = storage.GetStorageTable(StorageTable);
-                var deleteOperation = TableOperation.Delete(questionEntity);
-
-                table.Execute(deleteOperation);
+                var questionEntity = _storage.GetEntityByPartionKey<QuestionEntity>(id);
+                _storage.DeleteEntity(questionEntity);
 
                 return RedirectToAction("Index");
             }
@@ -137,16 +110,6 @@ namespace Web.Controllers
             {
                 return View();
             }
-        }
-
-        private QuestionEntity GetQuestionEntityById(string id)
-        {
-            var storage = new Storage(_storageConnectionString);
-            var questionEntityTable = storage.GetStorageTable(StorageTable);
-            var questionEntityQuery = new TableQuery<QuestionEntity>().Where(
-                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, id));
-            var questionEntity = questionEntityTable.ExecuteQuery(questionEntityQuery).FirstOrDefault();
-            return questionEntity;
         }
     }
 }

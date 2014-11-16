@@ -15,15 +15,12 @@ namespace Web.Controllers
     public class QuestionAndAnswerController : ApiController
     {
         private readonly string _storageConnectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
-        private const string QuestionStorageTable = "questions";
-        private const string AnswersStorageTable = "answers";
 
         public QuestionAndAnswers Get([FromUri]string presentationCode, [FromUri]string questionCode)
         {
-            var storage = new Storage(_storageConnectionString);
-            var questionEntityTable = storage.GetStorageTable(QuestionStorageTable);
+            var questionStorage = new Storage(_storageConnectionString, Constants.Questions);
             var questionEntityQuery = new TableQuery<QuestionEntity>();
-            var questionEntities = questionEntityTable.ExecuteQuery(questionEntityQuery);
+            var questionEntities = questionStorage.CloudTable.ExecuteQuery(questionEntityQuery);
 
             if (questionEntities != null)
             {
@@ -32,20 +29,11 @@ namespace Web.Controllers
                     if (questionEntity.PresentationCode == presentationCode &&
                         questionEntity.QuestionCode == questionCode)
                     {
-                        var answerEntitiesCloudTable = storage.GetStorageTable(AnswersStorageTable);
-                        var answerEntitiesQuery = new TableQuery<AnswerEntity>();
-                        var answerEntities = answerEntitiesCloudTable.ExecuteQuery(answerEntitiesQuery);
-                        var answerEnumerable = answerEntities as AnswerEntity[] ?? answerEntities.ToArray();
-
-                        var answers = new List<Answer>();
-
-                        foreach (var answer in answerEnumerable)
-                        {
-                            if (answer.QuestionKey == questionEntity.QuestionKey)
-                            {
-                                answers.Add(new Answer {PossibleAnswer = answer.PossibleAnswer});
-                            }
-                        }
+                        var answerStorage = new Storage(_storageConnectionString, Constants.Answers);
+                        var answerEntities = answerStorage.GetEntities<AnswerEntity>();
+                        var answers = (from answer in answerEntities 
+                                       where answer.QuestionKey == questionEntity.QuestionKey 
+                                       select new Answer {PossibleAnswer = answer.PossibleAnswer}).ToList();
 
                         var qanda = new QuestionAndAnswers
                         {
@@ -76,15 +64,10 @@ namespace Web.Controllers
                 Feedback = asandf.Feedback,
             };
 
-            var storage = new Storage(_storageConnectionString);
-            var table = storage.GetStorageTable("answersandfeedback");
-            var insertOperation = TableOperation.Insert(asandfEntity);
-            table.Execute(insertOperation);
+            var storage = new Storage(_storageConnectionString, Constants.AnswersAndFeedback);
+            storage.InsertEntity(asandfEntity);
 
-
-            var answersAndFeedbackTable = storage.GetStorageTable("answersandfeedback");
-
-            IEnumerable<AnswersAndFeedbackEntity> query = ( from feedback in answersAndFeedbackTable.CreateQuery<AnswersAndFeedbackEntity>()
+            IEnumerable<AnswersAndFeedbackEntity> query = ( from feedback in storage.CloudTable.CreateQuery<AnswersAndFeedbackEntity>()
                                                             where feedback.QuestionCode == asandf.QuestionCode
                                                             select feedback);
 

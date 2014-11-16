@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage.Table;
 using Web.Entities;
 using Web.Utils;
 
@@ -12,41 +9,31 @@ namespace Web.Controllers
 {
     public class AnswerController : Controller
     {
-        private readonly string _storageConnectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
-        private const string StorageTable = "answers";
-       
-        // GET: ApiDefinition
+        private static readonly string StorageConnectionString = CloudConfigurationManager.GetSetting("StorageConnectionString");
+        private readonly Storage _storage = new Storage(StorageConnectionString, Constants.Answers);
+
+        // GET: Answer
         public ActionResult Index()
         {
-            var storage = new Storage(_storageConnectionString);
-            var answerEntitiesCloudTable = storage.GetStorageTable(StorageTable);
-            var answerEntitiesQuery = new TableQuery<AnswerEntity>();
-            var answerEntities = answerEntitiesCloudTable.ExecuteQuery(answerEntitiesQuery);
-
-            var enumerable = answerEntities as AnswerEntity[] ?? answerEntities.ToArray();
-            if (enumerable.Any())
-            {
-                return View(enumerable.ToList());
-            }
-
-            return View();
+            var answerEntities = _storage.GetEntities<AnswerEntity>().OrderBy(answers => answers.QuestionKey);
+            return View(answerEntities);
         }
 
-        // GET: ApiDefinition/Details/5
+        // GET: Answer/Details/5
         public ActionResult Details(string id)
         {
-            var answerEntity = GetAnswerEntityById(id);
+            var answerEntity = _storage.GetEntityByPartionKey<AnswerEntity>(id);
 
             return View(answerEntity);
         }
 
-        // GET: ApiDefinition/Create
+        // GET: Answer/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: ApiDefinition/Create
+        // POST: Answer/Create
         [HttpPost]
         public ActionResult Create(FormCollection collection)
         {
@@ -54,17 +41,14 @@ namespace Web.Controllers
             {
                 var id = Guid.NewGuid().ToString();
                 var questionKey = collection["QuestionKey"];
-                var questionAndAnswer = new AnswerEntity(id, questionKey)
+                var answerEntity = new AnswerEntity(id, questionKey)
                 {
                     AnswerKey = id,
                     QuestionKey = questionKey,
                     PossibleAnswer = collection["PossibleAnswer"]
                 };
 
-                var storage = new Storage(_storageConnectionString);
-                var table = storage.GetStorageTable(StorageTable);
-                var insertOperation = TableOperation.Insert(questionAndAnswer);
-                table.Execute(insertOperation);
+                _storage.InsertEntity(answerEntity);
 
                 return RedirectToAction("Index");
             }
@@ -74,29 +58,26 @@ namespace Web.Controllers
             }
         }
 
-        // GET: ApiDefinition/Edit/5
+        // GET: Answer/Edit/5
         public ActionResult Edit(string id)
         {
-            var aswerEntity = GetAnswerEntityById(id);
+            var aswerEntity = _storage.GetEntityByPartionKey<AnswerEntity>(id);
 
             return View(aswerEntity);
         }
 
-        // POST: ApiDefinition/Edit/5
+        // POST: Answer/Edit/5
         [HttpPost]
         public ActionResult Edit(string id, FormCollection collection)
         {
             try
             {
-                var updatedAnswerEntity = GetAnswerEntityById(id);
+                var updatedAnswerEntity = _storage.GetEntityByPartionKey<AnswerEntity>(id);
 
                 updatedAnswerEntity.QuestionKey = collection["QuestionKey"];
                 updatedAnswerEntity.PossibleAnswer = collection["PossibleAnswer"];
 
-                var storage = new Storage(_storageConnectionString);
-                var table = storage.GetStorageTable(StorageTable);
-                var updateOperation = TableOperation.Replace(updatedAnswerEntity);
-                table.Execute(updateOperation);
+                _storage.UpdateEntity(updatedAnswerEntity);
 
                 return RedirectToAction("Index");
             }
@@ -106,27 +87,22 @@ namespace Web.Controllers
             }
         }
 
-        // GET: ApiDefinition/Delete/5
+        // GET: Answer/Delete/5
         public ActionResult Delete(string id)
         {
-            var answerEntity = GetAnswerEntityById(id);
+            var answerEntity = _storage.GetEntityByPartionKey<AnswerEntity>(id);
 
             return View(answerEntity);
         }
 
-        // POST: ApiDefinition/Delete/5
+        // POST: Answer/Delete/5
         [HttpPost]
         public ActionResult Delete(string id, FormCollection collection)
         {
             try
             {
-                var questionAndAnswerEntity = GetAnswerEntityById(id);
-
-                var storage = new Storage(_storageConnectionString);
-                var table = storage.GetStorageTable(StorageTable);
-                var deleteOperation = TableOperation.Delete(questionAndAnswerEntity);
-
-                table.Execute(deleteOperation);
+                var answerEntity = _storage.GetEntityByPartionKey<AnswerEntity>(id);
+                _storage.DeleteEntity(answerEntity);
 
                 return RedirectToAction("Index");
             }
@@ -134,16 +110,6 @@ namespace Web.Controllers
             {
                 return View();
             }
-        }
-
-        private AnswerEntity GetAnswerEntityById(string id)
-        {
-            var storage = new Storage(_storageConnectionString);
-            var answerEntityTable = storage.GetStorageTable(StorageTable);
-            var answerEntityQuery = new TableQuery<AnswerEntity>().Where(
-                TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, id));
-            var answerEntity = answerEntityTable.ExecuteQuery(answerEntityQuery).FirstOrDefault();
-            return answerEntity;
         }
     }
 }

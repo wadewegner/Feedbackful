@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using DotNet.Highcharts.Helpers;
 using DotNet.Highcharts.Options;
 using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage.Table;
 using Web.Entities;
 using Web.Utils;
 
@@ -21,14 +18,14 @@ namespace Web.Controllers
         {
             var questionKey = Request.QueryString["questionKey"];
             var questionCode = Request.QueryString["questionCode"];
+            
             ViewBag.QuestionCode = questionCode;
             ViewBag.QuestionKey = questionKey;
             ViewBag.Question = Request.QueryString["question"];
 
-            var storage = new Storage(_storageConnectionString);
-            var answersTable = storage.GetStorageTable("answers");
+            var storage = new Storage(_storageConnectionString, Constants.Answers);
 
-            IEnumerable<AnswerEntity> query = (from feedback in answersTable.CreateQuery<AnswerEntity>()
+            IEnumerable<AnswerEntity> query = (from feedback in storage.CloudTable.CreateQuery<AnswerEntity>()
                                                where feedback.QuestionKey == questionKey
                                                select feedback);
 
@@ -38,7 +35,7 @@ namespace Web.Controllers
             ViewBag.DefaultAnswer4 = "";
 
             var i = 0;
-            string[] categories = new string[query.Count()];
+            var categories = new string[query.Count()];
             foreach (var answerEntity in query)
             {
                 categories[i] = answerEntity.PossibleAnswer;
@@ -63,9 +60,9 @@ namespace Web.Controllers
                 i++;
             }
 
-            var answersAndFeedbackTable = storage.GetStorageTable("answersandfeedback");
+            var answersAndFeedbackStorage = new Storage(_storageConnectionString, Constants.AnswersAndFeedback);
 
-            IEnumerable<AnswersAndFeedbackEntity> query2 = (from feedback in answersAndFeedbackTable.CreateQuery<AnswersAndFeedbackEntity>()
+            IEnumerable<AnswersAndFeedbackEntity> query2 = (from feedback in answersAndFeedbackStorage.CloudTable.CreateQuery<AnswersAndFeedbackEntity>()
                                                             where feedback.QuestionCode == questionCode
                                                            select feedback);
 
@@ -93,6 +90,5 @@ namespace Web.Controllers
 
             return View(chart);
         }
-
     }
 }

@@ -16,105 +16,104 @@
     <script src="~/Scripts/Highcharts-4.0.1/js/highcharts.js" type="text/javascript"></script>
     
     <script type="text/javascript">
-    $(function() {
-        var c = {
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: 1,
-                plotShadow: false
-            },
-            tooltip: {
-                pointFormat: '{series.name}:'
-            },
-            title: {
-                text: ''
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+        $(function() {
+            var c = {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: 1,
+                    plotShadow: false
+                },
+                tooltip: {
+                    pointFormat: '{series.name}:'
+                },
+                title: {
+                    text: ''
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y} count)',
+                        }
                     }
-                }
-            },
-            series: [
-            {
-                type: 'pie',
-                name: @ViewBag.QuestionCode,
-                data: [
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        name: @ViewBag.QuestionCode,
+                        data: [
                             ['@ViewBag.DefaultAnswer1', @ViewBag.Answer1],
                             ['@ViewBag.DefaultAnswer2', @ViewBag.Answer2],
-                        @if (ViewBag.DefaultAnswer3 != "")
-                        {
-                            @:['@ViewBag.DefaultAnswer3', @ViewBag.Answer3],
-                        }
-                        @if (ViewBag.DefaultAnswer4 != "")
-                        {
-                            @:['@ViewBag.DefaultAnswer4', @ViewBag.Answer4]
-                        }
-                    ]
-                }
+                            @if (ViewBag.DefaultAnswer3 != "")
+                            {
+                                @:['@ViewBag.DefaultAnswer3', @ViewBag.Answer3],
+                            }
+                            @if (ViewBag.DefaultAnswer4 != "")
+                            {
+                                @:['@ViewBag.DefaultAnswer4', @ViewBag.Answer4]
+                            }
+                        ]
+                    }
                 ]
             };
 
-        $('#container').highcharts(c);
+            $('#container').highcharts(c);
 
 
-        var con = $.hubConnection();
-        var hub = con.createHubProxy('feedbackHub');
-        hub.on('feedback', function(chartBit) {
-            if (chartBit.QuestionCode == '@ViewBag.QuestionCode') {
+            var con = $.hubConnection();
+            var hub = con.createHubProxy('feedbackHub');
+            hub.on('feedback', function(chartBit) {
+                if (chartBit.QuestionCode == '@ViewBag.QuestionCode') {
 
-                var c = {
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: 1,
-                        plotShadow: false
-                    },
-                    tooltip: {
-                        pointFormat: '{series.name}:'
-                    },
-                    title: {
-                        text: ''
-                    },
-                    plotOptions: {
-                        pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
-                                enabled: true,
-                                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    var c = {
+                        chart: {
+                            plotBackgroundColor: null,
+                            plotBorderWidth: 1,
+                            plotShadow: false
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}:'
+                        },
+                        title: {
+                            text: ''
+                        },
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y} count)',
+                                }
                             }
-                        }
-                    },
-                    series: [
-                    {
-                        type: 'pie',
-                        name: chartBit.QuestionCode,
-                        data: [
-                            ['@ViewBag.DefaultAnswer1', chartBit.Answer1],
-                            ['@ViewBag.DefaultAnswer2', chartBit.Answer2],
-                        @if (ViewBag.DefaultAnswer3 != "")
-                        {
-                        @:['@ViewBag.DefaultAnswer3', chartBit.Answer3],
-                }
-                        @if (ViewBag.DefaultAnswer4 != "")
-                        {
-                            @:['@ViewBag.DefaultAnswer4', chartBit.Answer4]
-                        }
-
+                        },
+                        series: [
+                            {
+                                type: 'pie',
+                                name: chartBit.QuestionCode,
+                                data: [
+                                    ['@ViewBag.DefaultAnswer1', chartBit.Answer1],
+                                    ['@ViewBag.DefaultAnswer2', chartBit.Answer2],
+                                    @if (ViewBag.DefaultAnswer3 != "")
+                                    {
+                                        @:['@ViewBag.DefaultAnswer3', chartBit.Answer3],
+                                    }
+                                    @if (ViewBag.DefaultAnswer4 != "")
+                                    {
+                                        @:['@ViewBag.DefaultAnswer4', chartBit.Answer4]
+                                    }
+                                ]
+                            }
                         ]
-                    }
-                    ]
-                };
+                    };
 
-                $('#container').highcharts(c);
-            };
+                    $('#container').highcharts(c);
+                };
+            });
+            con.start();
         });
-        con.start();
-    });
     </script>
     
 }
